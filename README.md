@@ -10,8 +10,20 @@
 ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-1877F2?style=for-the-badge&logoColor=white)
 
+### 🔗 Live at [facebookone.vercel.app](https://facebookone.vercel.app/)
+
 <img src="docs/preview.png" alt="Facebook Downloader preview" width="820" />
 
+</div>
+
+---
+
+## 🎬 It works
+
+Paste a link and the real video previews on its own, ready to download in HD or SD.
+
+<div align="center">
+<img src="docs/live-frontend.png" alt="Facebook Downloader previewing a real reel" width="820" />
 </div>
 
 ---
@@ -70,6 +82,12 @@ facebook-downloader/
 cd backend
 go run .            # listens on :4447, serves ./public
 ```
+
+The Go server runs on its own, extraction and downloads included.
+
+<div align="center">
+<img src="docs/backend-terminal.png" alt="Facebook backend running independently" width="760" />
+</div>
 
 **Frontend**
 
