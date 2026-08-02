@@ -115,21 +115,47 @@ func unescapeJSON(s string) string {
 	return s
 }
 
+// safeName turns a title into a filesystem safe filename. Reserved characters
+// become spaces, runs of whitespace collapse, and the result is cut on a rune
+// boundary so a trailing emoji is never split into invalid bytes.
 func safeName(s string) string {
 	s = strings.Map(func(r rune) rune {
-		if strings.ContainsRune(`\/:*?"<>|`, r) || r < 32 {
-			return '_'
+		if strings.ContainsRune("\\/:*?\"<>|\u2014\u2013", r) || r < 32 {
+			return ' '
 		}
 		return r
 	}, s)
-	if len(s) > 60 {
-		s = s[:60]
+	s = strings.Join(strings.Fields(s), " ")
+	if r := []rune(s); len(r) > 70 {
+		s = strings.TrimSpace(string(r[:70]))
 	}
-	s = strings.TrimSpace(s)
 	if s == "" {
 		s = "facebook"
 	}
 	return s
+}
+
+// nameFromTitle pulls a clean caption out of an og:title. On reels this reads
+// like "12M views · 3K reactions | caption | author", so a leading stats
+// segment is dropped and the caption is kept as the filename.
+func nameFromTitle(t string) string {
+	t = strings.TrimSpace(t)
+	if t == "" {
+		return ""
+	}
+	parts := strings.Split(t, " | ")
+	if len(parts) > 1 {
+		low := strings.ToLower(parts[0])
+		if strings.Contains(low, "views") || strings.Contains(low, "reaction") {
+			parts = parts[1:]
+		}
+	}
+	caption := strings.TrimSpace(parts[0])
+	// Drop a trailing run of hashtags so the readable caption leads the name.
+	if i := strings.Index(caption, " #"); i > 0 {
+		caption = strings.TrimSpace(caption[:i])
+	}
+	return caption
 }
 
 func firstMatch(re *regexp.Regexp, body []byte) string {
@@ -288,14 +314,21 @@ func extract(rawURL string) (*Post, error) {
 	}
 
 	title := firstMatch(ogTitle, body)
-	base := safeName(id)
+
+	// Name the file after the title. Fall back to the reel id so a post without
+	// a readable title still downloads with a sensible name. HD and SD carry a
+	// tag so the two renditions do not overwrite each other.
+	base := safeName(nameFromTitle(title))
+	if base == "" || base == "facebook" {
+		base = safeName(id)
+	}
 
 	var variants []Variant
 	if hd != "" {
-		variants = append(variants, Variant{URL: hd, Label: "HD", Filename: base + "_hd.mp4"})
+		variants = append(variants, Variant{URL: hd, Label: "HD", Filename: base + " (HD).mp4"})
 	}
 	if sd != "" {
-		variants = append(variants, Variant{URL: sd, Label: "SD", Filename: base + "_sd.mp4"})
+		variants = append(variants, Variant{URL: sd, Label: "SD", Filename: base + " (SD).mp4"})
 	}
 
 	best := variants[0]
