@@ -1,3 +1,5 @@
+export const API_BASE = import.meta.env.VITE_API_BASE ?? "";
+
 export interface Variant {
   url: string;
   label: string;
@@ -25,7 +27,7 @@ export interface Post {
 }
 
 export const downloadHref = (m: Media | Variant): string =>
-  `/api/download?url=${encodeURIComponent(m.url)}&filename=${encodeURIComponent(m.filename)}`;
+  `${API_BASE}/api/download?url=${encodeURIComponent(m.url)}&filename=${encodeURIComponent(m.filename)}`;
 
 /**
  * Inline playback url. The CDN rejects browser requests that arrive without the
@@ -33,4 +35,4 @@ export const downloadHref = (m: Media | Variant): string =>
  * straight to the CDN.
  */
 export const previewSrc = (m: Media | Variant): string =>
-  `/api/media?url=${encodeURIComponent(m.url)}`;
+  `${API_BASE}/api/media?url=${encodeURIComponent(m.url)}`;
