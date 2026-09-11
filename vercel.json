@@ -1,12 +1,9 @@
 {
   "framework": null,
-  "services": {
-    "web": {
-      "root": ".",
-      "entrypoint": "Dockerfile.vercel"
+  "routes": [
+    {
+      "src": "/api/(.+)",
+      "dest": "/api/proxy?p=$1"
     }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": { "service": "web" } }
   ]
 }
