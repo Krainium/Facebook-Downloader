@@ -1,9 +1,4 @@
 {
-  "framework": null,
-  "routes": [
-    {
-      "src": "/api/(.+)",
-      "dest": "/api/proxy?p=$1"
-    }
-  ]
+  "outputDirectory": "dist",
+  "framework": null
 }
